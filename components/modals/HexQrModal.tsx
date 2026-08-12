@@ -120,17 +120,6 @@ export default function HexQrModal({ active, onClose, mode, autoCountdown }: {
                 >
                   <span>Close</span>
                 </button>
-
-                {currentCheckpoint && (
-                  <a
-                    href={`/teams/${teamName}/qr/${currentCheckpoint.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 inline-flex justify-center items-center rounded-full font-bold transition-all duration-300 ease-out active:scale-[0.97] px-4 py-3 sm:py-4 font-display text-lg sm:text-xl bg-blue-50 text-blue-600 border-2 border-blue-100 hover:bg-blue-100 hover:border-blue-200 shadow-sm"
-                  >
-                    View Checkpoint
-                  </a>
-                )}
               </div>
             )}
           </div>
