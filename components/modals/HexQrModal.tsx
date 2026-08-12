@@ -78,7 +78,7 @@ export default function HexQrModal({ active, onClose, mode, autoCountdown }: {
             </svg>
           </div>
           <h4 className="mt-1 mb-3 text-2xl sm:text-3xl font-display font-[900] text-surface-dark tracking-tight text-center uppercase [-webkit-text-stroke:1px_currentColor]">Checkpoint {cpIndex} QR</h4>
-          <p className="text-xs sm:text-sm text-zinc-500 mx-auto mb-6 sm:mb-8 text-center leading-relaxed font-semibold">This QR code contains the checkpoint access information for this location.</p>
+          <p className="text-xs sm:text-sm text-zinc-500 mx-auto mb-6 sm:mb-8 text-center leading-relaxed font-semibold">Scan the code below or use PIN <strong className="text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-md tracking-widest">{currentCheckpoint?.verifyCode}</strong> to verify.</p>
 
           <div className="p-3 sm:p-5 bg-white border-2 border-zinc-100 rounded-2xl sm:rounded-[28px] shadow-sm inline-block mx-auto mb-6 sm:mb-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
