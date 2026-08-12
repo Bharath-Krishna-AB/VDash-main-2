@@ -91,6 +91,9 @@ export async function deleteAccountAction(id: string) {
   } catch (err: any) {
     return { error: err.message };
   }
+  // Delete associated route assignments first to satisfy foreign key constraint
+  const { error: assignError } = await supabaseAdmin.from('assignroute').delete().eq('teamid', id);
+  if (assignError) return { error: assignError.message };
 
   const { error } = await supabaseAdmin.from('profiles').delete().eq('id', id);
   if (error) return { error: error.message };
