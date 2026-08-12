@@ -91,8 +91,8 @@ export default function CheckpointModal({ isOpen, initialData, onClose, onSave }
                 QR Code Clue
               </label>
               <textarea 
-                value={formData.qrhint}
-                onChange={(e) => handleChange('qrhint', e.target.value)}
+                value={formData.apphint}
+                onChange={(e) => handleChange('apphint', e.target.value)}
                 className="w-full bg-zinc-50 border border-zinc-200/60 rounded-[1.25rem] px-5 py-4 font-semibold text-zinc-900 min-h-[120px] focus:outline-none focus:border-zinc-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(24,24,27,0.05)] transition-all resize-none placeholder:text-zinc-400" 
                 placeholder="Enter text to embed inside the QR code..." 
               />
@@ -103,8 +103,8 @@ export default function CheckpointModal({ isOpen, initialData, onClose, onSave }
                 App Hint
               </label>
               <textarea 
-                value={formData.apphint}
-                onChange={(e) => handleChange('apphint', e.target.value)}
+                value={formData.qrhint}
+                onChange={(e) => handleChange('qrhint', e.target.value)}
                 className="w-full bg-zinc-50 border border-zinc-200/60 rounded-[1.25rem] px-5 py-4 font-semibold text-zinc-900 min-h-[120px] focus:outline-none focus:border-zinc-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(24,24,27,0.05)] transition-all resize-none placeholder:text-zinc-400" 
                 placeholder="Hint shown inside the app when teams are stuck..." 
               />
