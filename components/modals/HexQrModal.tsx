@@ -78,7 +78,7 @@ export default function HexQrModal({ active, onClose, mode, autoCountdown }: {
             </svg>
           </div>
           <h4 className="mt-1 mb-3 text-2xl sm:text-3xl font-display font-[900] text-surface-dark tracking-tight text-center uppercase [-webkit-text-stroke:1px_currentColor]">Checkpoint {cpIndex} QR</h4>
-          <p className="text-xs sm:text-sm text-zinc-500 mx-auto mb-6 sm:mb-8 text-center leading-relaxed font-semibold">This QR code contains the checkpoint access information for this location.</p>
+          <p className="text-xs sm:text-sm text-zinc-500 mx-auto mb-6 sm:mb-8 text-center leading-relaxed font-semibold">Display this QR code to be scanned to verify your arrival and claim your reward.</p>
 
           <div className="p-3 sm:p-5 bg-white border-2 border-zinc-100 rounded-2xl sm:rounded-[28px] shadow-sm inline-block mx-auto mb-6 sm:mb-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -120,17 +120,6 @@ export default function HexQrModal({ active, onClose, mode, autoCountdown }: {
                 >
                   <span>Close</span>
                 </button>
-
-                {currentCheckpoint && (
-                  <a
-                    href={`/teams/${teamName}/qr/${currentCheckpoint.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 inline-flex justify-center items-center rounded-full font-bold transition-all duration-300 ease-out active:scale-[0.97] px-4 py-3 sm:py-4 font-display text-lg sm:text-xl bg-blue-50 text-blue-600 border-2 border-blue-100 hover:bg-blue-100 hover:border-blue-200 shadow-sm"
-                  >
-                    View Checkpoint
-                  </a>
-                )}
               </div>
             )}
           </div>

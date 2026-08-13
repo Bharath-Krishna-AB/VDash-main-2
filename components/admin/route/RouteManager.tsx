@@ -6,6 +6,7 @@ import CheckpointModal from './CheckpointModal';
 import CheckpointDeleteModal from './CheckpointDeleteModal';
 import RouteDeleteModal from './RouteDeleteModal';
 import RouteModal from './RouteModal';
+import PrintQRModal from './PrintQRModal';
 import { Input } from '@/components/ui/Input';
 
 import { addCheckpoint, updateCheckpoint, deleteCheckpoint, addRoute, updateRoute, deleteRoute, DBRouteData } from '@/app/admin/routes/actions';
@@ -64,6 +65,10 @@ export default function RouteManager({ initialCheckpoints, initialRoutes }: Rout
   const [deletingCheckpointIds, setDeletingCheckpointIds] = useState<string[]>([]);
   const [checkpointAffectedRoutes, setCheckpointAffectedRoutes] = useState<{ id: string, name: string }[]>([]);
 
+  // Print QR Modal State
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [printingCheckpoint, setPrintingCheckpoint] = useState<CheckpointData | null>(null);
+
   // --- CHECKPOINT ACTIONS ---
   const handleCreateCheckpoint = () => {
     setEditingCheckpoint({
@@ -81,6 +86,14 @@ export default function RouteManager({ initialCheckpoints, initialRoutes }: Rout
     if (cp) {
       setEditingCheckpoint(cp);
       setIsCheckpointModalOpen(true);
+    }
+  };
+
+  const handlePrintQR = (id: string) => {
+    const cp = checkpoints.find(c => c.id === id);
+    if (cp) {
+      setPrintingCheckpoint(cp);
+      setIsPrintModalOpen(true);
     }
   };
 
@@ -363,12 +376,12 @@ export default function RouteManager({ initialCheckpoints, initialRoutes }: Rout
           </div>
         ) : (
           filteredCheckpoints.map(cp => (
-            <CheckpointItem 
-              key={cp.id}
+              <CheckpointItem 
+                key={cp.id}
                 checkpoint={cp}
                 onEdit={handleEditCheckpoint}
                 onRemove={handleDeleteCheckpoint}
-                onPrintQR={(id) => console.log('Print QR', id)}
+                onPrintQR={handlePrintQR}
                 selectable={true}
                 selected={selectedCheckpoints.has(cp.id)}
                 onSelect={toggleCheckpointSelection}
@@ -601,6 +614,13 @@ export default function RouteManager({ initialCheckpoints, initialRoutes }: Rout
         onEditRoute={handleAffectedRouteEdit}
         onDeleteRoute={handleAffectedRouteDelete}
         onForceDeleteAll={handleForceDeleteCheckpoints}
+      />
+
+      {/* Print QR Modal */}
+      <PrintQRModal
+        isOpen={isPrintModalOpen}
+        checkpoint={printingCheckpoint}
+        onClose={() => setIsPrintModalOpen(false)}
       />
     </div>
   );
