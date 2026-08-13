@@ -17,16 +17,6 @@ interface TutorialStep {
 
 const STEPS: TutorialStep[] = [
   {
-    targetId: 'tutorial-timer',
-    title: 'Dashboard',
-    content: 'Your master timer and progress tracker. Keep an eye here to ensure your team is on pace to conquer the route.',
-    position: 'center',
-    align: 'center',
-    padding: 0,
-    borderRadius: 40,
-    icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-  },
-  {
     targetId: 'tutorial-hint',
     title: 'Need a Lifeline?',
     content: 'Stuck on a tricky clue? Tap here to unlock a hint. Keep in mind, this lifeline only appears when time is running out!',
