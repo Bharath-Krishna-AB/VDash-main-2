@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useGame } from '@/components/teams/GameContext';
+import ClientModalLink from '@/components/ui/ClientModalLink';
 
 export default function HintDetailPage() {
   const { currentCheckpoint, gameState } = useGame();
@@ -79,9 +80,8 @@ export default function HintDetailPage() {
 
       {/* Verify Pin Full Width Button */}
       <div className="w-full mt-[4px] mb-[8px] relative z-30">
-        <Link
-          href="?modal=verify"
-          scroll={false}
+        <ClientModalLink
+          modal="verify"
           className="w-full min-h-[56px] sm:min-h-[64px] bg-[#18181B] text-[#FFFFFF] border-[2px] border-[#18181B] rounded-[22px] p-[14px_16px] sm:p-[18px_20px] text-[1rem] sm:text-[1.1rem] font-[800] tracking-[-0.01em] flex items-center justify-center gap-[6px] cursor-pointer transition-all duration-150 ease-[ease] shadow-[0_6px_16px_rgba(24,24,27,0.2)] hover:bg-[#27272A] hover:border-[#27272A] hover:-translate-y-[2px] hover:shadow-[0_8px_20px_rgba(24,24,27,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-[0_4px_12px_rgba(24,24,27,0.15)]"
         >
           <span>Verify Code</span>
@@ -89,7 +89,7 @@ export default function HintDetailPage() {
             <path d="M5 12h14"></path>
             <path d="m12 5 7 7-7 7"></path>
           </svg>
-        </Link>
+        </ClientModalLink>
       </div>
     </section>
   );
