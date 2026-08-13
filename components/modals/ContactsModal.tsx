@@ -32,19 +32,19 @@ export default function ContactsModal({ active, onClose }: { active: boolean, on
             <div className="font-extrabold text-sm sm:text-base text-surface-dark">Bharath</div>
             <div className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wide sm:tracking-wider mt-0.5 truncate max-w-[130px] sm:max-w-none">Main Coordinator - CTO</div>
           </div>
-          <a href="tel:+15550199" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
+          <a href="tel:6235311216" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
             <svg width="16" height="16" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
           </a>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 py-2 sm:py-3 px-3 sm:px-4 bg-zinc-50 rounded-2xl border-2 border-zinc-100 transition-colors">
           <div className="w-9 h-9 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 shadow-sm border border-zinc-200">
-            <Image src="/helpdesk1.jpeg" alt="Antony" fill className="object-cover" />
+            <Image src="/alfred.jpeg" alt="Alfred" fill className="object-cover" />
           </div>
           <div className="flex-1">
-            <div className="font-extrabold text-sm sm:text-base text-surface-dark">Antony</div>
-            <div className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wide sm:tracking-wider mt-0.5 truncate max-w-[130px] sm:max-w-none">Main Coordinator - CMO</div>
+            <div className="font-extrabold text-sm sm:text-base text-surface-dark">Alfred</div>
+            <div className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wide sm:tracking-wider mt-0.5 truncate max-w-[130px] sm:max-w-none">Coordinator - CEO</div>
           </div>
-          <a href="tel:+15550198" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
+          <a href="tel:+919495911910" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
             <svg width="16" height="16" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
           </a>
         </div>
@@ -56,22 +56,11 @@ export default function ContactsModal({ active, onClose }: { active: boolean, on
             <div className="font-extrabold text-sm sm:text-base text-surface-dark">Sidhaarth</div>
             <div className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wide sm:tracking-wider mt-0.5 truncate max-w-[130px] sm:max-w-none">Coordinator - CO CEO</div>
           </div>
-          <a href="tel:+15550197" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
+          <a href="tel:8078486125" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
             <svg width="16" height="16" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
           </a>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4 py-2 sm:py-3 px-3 sm:px-4 bg-zinc-50 rounded-2xl border-2 border-zinc-100 transition-colors">
-          <div className="w-9 h-9 sm:w-12 sm:h-12 relative rounded-full overflow-hidden shrink-0 shadow-sm border border-zinc-200">
-            <Image src="/helpdesk3.jpeg" alt="Ajvad" fill className="object-cover" />
-          </div>
-          <div className="flex-1">
-            <div className="font-extrabold text-sm sm:text-base text-surface-dark">Ajvad</div>
-            <div className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wide sm:tracking-wider mt-0.5 truncate max-w-[130px] sm:max-w-none">Coordinator - CO IPR</div>
-          </div>
-          <a href="tel:+15550196" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#f57a00]/10 text-[#f57a00] flex items-center justify-center transition-colors hover:bg-[#f57a00]/20 shrink-0">
-            <svg width="16" height="16" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          </a>
-        </div>
+
       </div>
 
       <button
