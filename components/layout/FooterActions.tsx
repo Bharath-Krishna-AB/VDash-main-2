@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import ClientModalLink from '@/components/ui/ClientModalLink';
 import { useGame } from '../teams/GameContext';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function FooterActions() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { gameState, currentCheckpoint } = useGame();
 
   // Whether we are in the final-minutes warning zone for the current checkpoint
@@ -45,44 +44,36 @@ export default function FooterActions() {
     const check = () => {
       const elapsed = Date.now() - gameState.timeStarted!;
       const remainingMs = Math.max(0, TOTAL_MS - elapsed);
-      setIsWarning(remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.1);
+      const isWarn = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.1;
+      
+      setIsWarning(isWarn);
+      
+      if (isWarn) {
+        setHintUnlocked(true);
+        const cpIndex = gameState.currentCheckpointIndex;
+        if (lastRedDotCheckpointRef.current !== cpIndex) {
+          lastRedDotCheckpointRef.current = cpIndex;
+          setShowRedDot(true);
+          setIsAttention(true);
+          if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
+          attentionTimerRef.current = setTimeout(() => setIsAttention(false), 700);
+          
+          const url = new URL(window.location.href);
+          url.searchParams.set('modal', 'hint');
+          window.history.pushState(null, '', url.toString());
+        }
+      }
     };
 
     check(); // immediate
     const interval = setInterval(check, 1000);
     return () => clearInterval(interval);
-  }, [gameState.timeStarted, gameState.isCompleted, currentCheckpoint, gameState.activeBonusMs]);
-
-  // ── Unlock hint & show red dot when warning triggers ────────────────────
-  useEffect(() => {
-    if (isWarning) {
-      // Unlock the hint button permanently for this session
-      setHintUnlocked(true);
-
-      const cpIndex = gameState.currentCheckpointIndex;
-
-      // Only fire once per checkpoint
-      if (lastRedDotCheckpointRef.current !== cpIndex) {
-        lastRedDotCheckpointRef.current = cpIndex;
-        setShowRedDot(true);
-
-        // Trigger attention animation
-        setIsAttention(true);
-        if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
-        attentionTimerRef.current = setTimeout(() => setIsAttention(false), 700);
-
-        // Auto-open the hint modal so teams see the clue immediately
-        router.replace('?modal=hint', { scroll: false });
-      }
-    }
-  }, [isWarning, gameState.currentCheckpointIndex]);
+  }, [gameState.timeStarted, gameState.isCompleted, currentCheckpoint, gameState.activeBonusMs, gameState.currentCheckpointIndex]);
 
   // ── Dismiss red dot when hint modal opens ────────────────────────────────
-  useEffect(() => {
-    if (searchParams?.get('modal') === 'hint') {
-      setShowRedDot(false);
-    }
-  }, [searchParams]);
+  if (showRedDot && searchParams?.get('modal') === 'hint') {
+    setShowRedDot(false);
+  }
 
   // Cleanup attention timer on unmount
   useEffect(() => {
@@ -104,10 +95,9 @@ export default function FooterActions() {
     <footer className="pt-[16px] px-[16px] sm:px-[24px] pb-[40px] flex justify-center items-center bg-transparent z-10 w-full relative">
       <div className="flex items-center gap-[10px] sm:gap-[16px] bg-white/90 backdrop-blur-[12px] px-[14px] sm:px-[20px] py-[10px] sm:py-[12px] rounded-[36px] shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-[1px] border-gray-100">
         {hintActive ? (
-          <Link
+          <ClientModalLink
             id="tutorial-hint"
-            href="?modal=hint"
-            scroll={false}
+            modal="hint"
             className={`w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] rounded-full bg-gray-100 border-none text-black cursor-pointer flex items-center justify-center transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-gray-200 active:scale-95 active:translate-y-0 relative${isAttention ? ' animate-[hint-attention_0.6s_cubic-bezier(0.36,0.07,0.19,0.97)_both]' : ''}`}
             aria-label="View Hint"
             title="View Checkpoint Hint"
@@ -123,7 +113,7 @@ export default function FooterActions() {
               <path d="M9 18h6"></path>
               <path d="M10 22h4"></path>
             </svg>
-          </Link>
+          </ClientModalLink>
         ) : (
           <div
             id="tutorial-hint"
@@ -138,10 +128,9 @@ export default function FooterActions() {
             </svg>
           </div>
         )}
-        <Link
+        <ClientModalLink
           id="tutorial-verify"
-          href="?modal=verify"
-          scroll={false}
+          modal="verify"
           className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] rounded-full bg-gray-100 border-none text-black cursor-pointer flex items-center justify-center transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-gray-200 active:scale-95 active:translate-y-0"
           aria-label="Verify Checkpoint Code"
           title="Verify Code"
@@ -151,11 +140,10 @@ export default function FooterActions() {
             <path d="m21 2-9.6 9.6"></path>
             <circle cx="7.5" cy="15.5" r="5.5"></circle>
           </svg>
-        </Link>
-        <Link
+        </ClientModalLink>
+        <ClientModalLink
           id="tutorial-contact"
-          href="?modal=contacts"
-          scroll={false}
+          modal="contacts"
           className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] rounded-full bg-gray-100 border-none text-black cursor-pointer flex items-center justify-center transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-gray-200 active:scale-95 active:translate-y-0"
           aria-label="Contact Help Desk for Assistance or Doubts"
           title="Need Help or Have Doubts? Contact Help Desk"
@@ -166,11 +154,10 @@ export default function FooterActions() {
             <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
             <path d="M1 14a10.5 10.5 0 0 1 21 0" />
           </svg>
-        </Link>
-        <Link
+        </ClientModalLink>
+        <ClientModalLink
           id="tutorial-qr"
-          href="?modal=qr"
-          scroll={false}
+          modal="qr"
           className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] rounded-full bg-gray-100 border-none text-black cursor-pointer flex items-center justify-center transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-gray-200 active:scale-95 active:translate-y-0"
           aria-label="Current Checkpoint QR Code"
         >
@@ -188,11 +175,10 @@ export default function FooterActions() {
             <path d="M21 12v.01"></path>
             <path d="M12 21v-1"></path>
           </svg>
-        </Link>
-        <Link
+        </ClientModalLink>
+        <ClientModalLink
           id="tutorial-logout"
-          href="?modal=logout"
-          scroll={false}
+          modal="logout"
           className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] rounded-full bg-zinc-900 border-none text-white cursor-pointer flex items-center justify-center transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-zinc-800 active:scale-95 active:translate-y-0 shadow-[0_4px_14px_rgba(24,24,27,0.25)]"
           aria-label="Logout"
         >
@@ -201,7 +187,7 @@ export default function FooterActions() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-        </Link>
+        </ClientModalLink>
       </div>
     </footer>
   );
