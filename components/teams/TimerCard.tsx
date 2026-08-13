@@ -43,8 +43,8 @@ export default function TimerCard({ teamName }: TimerCardProps) {
 
       setTimeRemaining(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
 
-      // Warning sound at 10% or less of the total available time (including bonus)
-      if (remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.1) {
+      // Warning sound at 20% or less of the total available time (including bonus)
+      if (remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2) {
         setIsWarning(true);
         if (audioRef.current && audioRef.current.paused) {
           audioRef.current.currentTime = 0;

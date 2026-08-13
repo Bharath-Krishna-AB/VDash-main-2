@@ -63,7 +63,7 @@ export async function logout() {
   cookieStore.delete('user_name');
 
   const supabase = createClient(cookieStore);
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: 'local' });
 
   redirect('/login');
 }
