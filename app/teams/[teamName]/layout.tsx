@@ -4,6 +4,7 @@ import FooterActions from '@/components/layout/FooterActions';
 import ModalsContainer from '@/components/modals/ModalsContainer';
 import { GameProvider } from '@/components/teams/GameContext';
 import AppTutorial from '@/components/teams/AppTutorial';
+import SessionKeepAlive from '@/components/teams/SessionKeepAlive';
 
 export default async function DashboardLayout({ 
   children, 
@@ -18,6 +19,7 @@ export default async function DashboardLayout({
   return (
     <div className="w-full h-[100dvh] bg-transparent flex flex-col relative overflow-hidden mx-auto">
       <GameProvider teamName={decodedTeamName}>
+        <SessionKeepAlive />
         <Header />
         <main className="flex-1 w-full max-w-[480px] mx-auto relative h-full flex flex-col pt-[100px]">
           {children}

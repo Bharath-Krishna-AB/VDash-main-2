@@ -1,10 +1,12 @@
 import React from 'react';
 import AdminBottomBar from '@/components/admin/AdminBottomBar';
 import KDashLogo from '@/components/ui/KDashLogo';
+import SessionKeepAlive from '@/components/teams/SessionKeepAlive';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-[100dvh] bg-transparent font-sans flex flex-col overflow-hidden relative">
+      <SessionKeepAlive />
       
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto px-4 py-6 md:px-10 md:py-8 pb-32 md:pb-32 flex flex-col">

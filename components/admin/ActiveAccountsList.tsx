@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteAccountAction, updateAccountAction } from '@/app/admin/create-account/actions';
+import { deleteAccountAction, updateAccountAction, bulkDeleteAccountsAction } from '@/app/admin/create-account/actions';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import PinInput from '@/components/ui/PinInput';
@@ -112,6 +112,8 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
   const [activeTab, setActiveTab] = useState<'admin' | 'user'>('admin');
   const [editingProfile, setEditingProfile] = useState<any | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<any | null>(null);
+  const [deletingBulk, setDeletingBulk] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [editForm, setEditForm] = useState<{username: string, pin: string[], phonenumber: string}>({ 
     username: '', 
     pin: ['', '', '', '', '', ''], 
@@ -217,6 +219,39 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
     });
   };
 
+  const confirmBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    setError('');
+    startTransition(() => {
+      bulkDeleteAccountsAction(Array.from(selectedIds)).then((res) => {
+        if (res.error) {
+          setError(res.error);
+        } else {
+          setDeletingBulk(false);
+          setSelectedIds(new Set());
+        }
+      });
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === filteredProfiles.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProfiles.map(p => p.id)));
+    }
+  };
+
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
   return (
     <section className="bg-surface rounded-[2.5rem] p-5 lg:p-6 shadow-xl flex flex-col border border-zinc-100 w-full relative">
       
@@ -261,14 +296,14 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
         <div className="flex gap-2 relative bg-zinc-50 p-1 rounded-full border border-zinc-100">
           <button 
             className={`flex items-center gap-2 px-6 py-2 text-sm font-bold tracking-wider uppercase rounded-full transition-all duration-300 ${activeTab === 'admin' ? 'bg-white shadow-sm text-surface-dark' : 'text-zinc-400 hover:text-surface-dark'}`}
-            onClick={() => { setActiveTab('admin'); setSearchQuery(''); }}
+            onClick={() => { setActiveTab('admin'); setSearchQuery(''); setSelectedIds(new Set()); }}
           >
             Admins
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${activeTab === 'admin' ? 'bg-brand-neon text-surface-dark' : 'bg-transparent text-zinc-400'}`}>{adminCount}</span>
           </button>
           <button 
             className={`flex items-center gap-2 px-6 py-2 text-sm font-bold tracking-wider uppercase rounded-full transition-all duration-300 ${activeTab === 'user' ? 'bg-white shadow-sm text-surface-dark' : 'text-zinc-400 hover:text-surface-dark'}`}
-            onClick={() => { setActiveTab('user'); setSearchQuery(''); }}
+            onClick={() => { setActiveTab('user'); setSearchQuery(''); setSelectedIds(new Set()); }}
           >
             Teams
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${activeTab === 'user' ? 'bg-brand-neon text-surface-dark' : 'bg-transparent text-zinc-400'}`}>{teamCount}</span>
@@ -277,15 +312,53 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
       </div>
 
       <div className="flex flex-col gap-2 pr-2 pb-2">
+        {/* Selection Actions Row */}
+        {filteredProfiles.length > 0 && (
+          <div className="flex items-center justify-between py-2 px-1 mb-2 shrink-0">
+            <button 
+              onClick={handleSelectAll}
+              className="flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-zinc-800 transition-colors"
+            >
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${selectedIds.size === filteredProfiles.length ? 'bg-brand-primary border-brand-primary text-white' : 'border-zinc-300 text-transparent'}`}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              {selectedIds.size === filteredProfiles.length ? 'Deselect All' : 'Select All'}
+            </button>
+            
+            {selectedIds.size > 0 && (
+              <button 
+                onClick={() => {
+                  setError('');
+                  setDeletingBulk(true);
+                }}
+                className="flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Delete Selected ({selectedIds.size})
+              </button>
+            )}
+          </div>
+        )}
+
         {filteredProfiles.length === 0 && (
           <div className="text-center text-zinc-400 py-12 text-lg font-bold flex flex-col items-center justify-center gap-3">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50"><circle cx="12" cy="12" r="10"></circle><path d="M16 16s-1.5-2-4-2-4 2-4 2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
             No accounts found.
           </div>
         )}
-        {filteredProfiles.map((profile, i) => (
-          <div key={profile.id} className="group flex flex-col gap-3 p-4 rounded-[1.5rem] bg-zinc-50 border border-zinc-100 transition-all hover:border-zinc-200 shrink-0 hover:shadow-sm">
+        {filteredProfiles.map((profile, i) => {
+          const isSelected = selectedIds.has(profile.id);
+          return (
+          <div key={profile.id} className={`group flex flex-col gap-3 p-4 rounded-[1.5rem] bg-zinc-50 border transition-all shrink-0 hover:shadow-sm ${isSelected ? 'border-brand-primary bg-brand-primary/5' : 'border-zinc-100 hover:border-zinc-200'}`}>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={() => toggleSelection(profile.id)}
+                className="shrink-0 flex items-center justify-center p-1"
+              >
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-brand-primary border-brand-primary text-white' : 'border-zinc-300 text-transparent group-hover:border-zinc-400'}`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </button>
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-display text-xl shrink-0 uppercase font-bold shadow-sm relative ${profile.role === 'admin' ? 'bg-brand-primary' : 'bg-surface-dark'}`}>
                 {profile.username.slice(0, 2)}
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-brand-success border-2 border-white rounded-full"></div>
@@ -313,7 +386,7 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Create Account Modal */}
@@ -425,6 +498,43 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
             
             <div className="flex flex-col gap-3 mt-2">
               <SwipeToConfirm onConfirm={confirmDelete} isPending={isPending} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {deletingBulk && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-zinc-900/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl border border-zinc-100 animate-in zoom-in-95 duration-200 flex flex-col gap-4 text-center">
+            <button 
+              onClick={() => setDeletingBulk(false)} 
+              disabled={isPending}
+              className="absolute top-6 right-6 p-2 bg-zinc-50 text-zinc-400 hover:text-zinc-900 border border-zinc-100 hover:border-zinc-200 rounded-full transition-all disabled:opacity-50"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 mt-4 shadow-lg shadow-red-500/20">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </div>
+            
+            <div className="mb-2">
+              <h3 className="text-2xl font-bold text-zinc-900 mb-2 tracking-tight">Delete {selectedIds.size} Accounts?</h3>
+              <p className="text-sm font-medium text-zinc-500 leading-relaxed">
+                Are you sure you want to delete the selected accounts? This action cannot be undone.
+              </p>
+            </div>
+            
+            {error && (
+              <div className="bg-red-50 text-red-500 p-3 rounded-xl text-sm font-bold border border-red-100 flex items-center gap-2 text-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                {error}
+              </div>
+            )}
+            
+            <div className="flex flex-col gap-3 mt-2">
+              <SwipeToConfirm onConfirm={confirmBulkDelete} isPending={isPending} />
             </div>
           </div>
         </div>
