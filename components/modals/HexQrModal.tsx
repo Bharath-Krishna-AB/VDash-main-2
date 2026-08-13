@@ -9,11 +9,9 @@ export default function HexQrModal({ active, onClose, mode, autoCountdown }: {
 }) {
   const [savedMode, setSavedMode] = useState(mode);
 
-  useEffect(() => {
-    if (active) {
-      setSavedMode(mode);
-    }
-  }, [active, mode]);
+  if (active && savedMode !== mode) {
+    setSavedMode(mode);
+  }
 
   const isDisplay = savedMode === 'display';
   const { verifyCode, currentCheckpoint, gameState, teamName } = useGame();
