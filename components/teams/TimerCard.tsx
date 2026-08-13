@@ -80,6 +80,7 @@ export default function TimerCard({ teamName }: TimerCardProps) {
       clearTimeout(initTimer);
       if (audioRef.current) audioRef.current.pause();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState.timeStarted, gameState.isCompleted, currentCheckpoint]);
 
   const handleStart = async () => {
