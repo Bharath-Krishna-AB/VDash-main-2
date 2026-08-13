@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import PinInput from '@/components/ui/PinInput';
 import CreateAccountForm from '@/components/admin/CreateAccountForm';
+import DeferredSearchInput from '@/components/ui/DeferredSearchInput';
 import BulkImportModal from '@/components/admin/BulkImportModal';
 
 const SwipeToConfirm = ({ onConfirm, isPending }: { onConfirm: () => void, isPending: boolean }) => {
@@ -109,7 +110,6 @@ const SwipeToConfirm = ({ onConfirm, isPending }: { onConfirm: () => void, isPen
 };
 
 export default function ActiveAccountsList({ initialProfiles }: { initialProfiles: any[] }) {
-  const [activeTab, setActiveTab] = useState<'admin' | 'user'>('admin');
   const [editingProfile, setEditingProfile] = useState<any | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<any | null>(null);
   const [deletingBulk, setDeletingBulk] = useState(false);
@@ -120,6 +120,22 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
     phonenumber: '' 
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'admin' | 'user'>('user');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('vd_activeTab');
+    if (saved === 'admin' || saved === 'user') {
+      setActiveTab(saved);
+    }
+  }, []);
+  
+  const handleTabChange = (tab: 'admin' | 'user') => {
+    setActiveTab(tab);
+    localStorage.setItem('vd_activeTab', tab);
+    setSearchQuery('');
+    setSelectedIds(new Set());
+  };
+  
   const [isPending, startTransition] = useTransition();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
@@ -153,7 +169,7 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
         // Defer state updates to avoid set-state-in-effect
         setTimeout(() => {
           if (profileToEdit.role !== activeTab) {
-            setActiveTab(profileToEdit.role);
+            handleTabChange(profileToEdit.role);
           }
           handleEdit(profileToEdit);
         }, 0);
@@ -261,15 +277,12 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
         
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 w-full flex-1 md:ml-8">
           <div className="relative w-full flex-1 max-w-lg">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </div>
-            <input 
-              type="text" 
+            <DeferredSearchInput
               placeholder={`Search ${activeTab === 'admin' ? 'admins' : 'teams'}...`}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-50 border border-zinc-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 rounded-full py-2.5 pl-12 pr-4 text-sm text-surface-dark font-medium transition-all duration-200 outline-none placeholder:text-zinc-400"
+              onSearch={setSearchQuery}
+              className="bg-zinc-50 border border-zinc-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 rounded-full py-2.5 text-sm text-surface-dark font-medium transition-all duration-200 outline-none placeholder:text-zinc-400"
+              icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>}
             />
           </div>
           
@@ -296,14 +309,14 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
         <div className="flex gap-2 relative bg-zinc-50 p-1 rounded-full border border-zinc-100">
           <button 
             className={`flex items-center gap-2 px-6 py-2 text-sm font-bold tracking-wider uppercase rounded-full transition-all duration-300 ${activeTab === 'admin' ? 'bg-white shadow-sm text-surface-dark' : 'text-zinc-400 hover:text-surface-dark'}`}
-            onClick={() => { setActiveTab('admin'); setSearchQuery(''); setSelectedIds(new Set()); }}
+            onClick={() => handleTabChange('admin')}
           >
             Admins
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${activeTab === 'admin' ? 'bg-brand-neon text-surface-dark' : 'bg-transparent text-zinc-400'}`}>{adminCount}</span>
           </button>
           <button 
             className={`flex items-center gap-2 px-6 py-2 text-sm font-bold tracking-wider uppercase rounded-full transition-all duration-300 ${activeTab === 'user' ? 'bg-white shadow-sm text-surface-dark' : 'text-zinc-400 hover:text-surface-dark'}`}
-            onClick={() => { setActiveTab('user'); setSearchQuery(''); setSelectedIds(new Set()); }}
+            onClick={() => handleTabChange('user')}
           >
             Teams
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${activeTab === 'user' ? 'bg-brand-neon text-surface-dark' : 'bg-transparent text-zinc-400'}`}>{teamCount}</span>
