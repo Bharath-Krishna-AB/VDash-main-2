@@ -3,6 +3,8 @@ import AdminBottomBar from '@/components/admin/AdminBottomBar';
 import KDashLogo from '@/components/ui/KDashLogo';
 import SessionKeepAlive from '@/components/teams/SessionKeepAlive';
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-[100dvh] bg-transparent font-sans flex flex-col overflow-hidden relative">
