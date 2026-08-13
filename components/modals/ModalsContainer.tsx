@@ -26,6 +26,13 @@ export default function ModalsContainer() {
 
   // ── Pre-checkpoint QR countdown ───────────────────────────────────────────
   const [countdown, setCountdown] = useState(10);
+  const [prevCheckpointIdx, setPrevCheckpointIdx] = useState(gameState.currentCheckpointIndex);
+
+  if (gameState.currentCheckpointIndex !== prevCheckpointIdx) {
+    setPrevCheckpointIdx(gameState.currentCheckpointIndex);
+    setCountdown(10);
+  }
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Keep a stable ref to beginTimer so the interval closure never goes stale
   const beginTimerRef = useRef(beginTimer);
@@ -44,11 +51,8 @@ export default function ModalsContainer() {
     // savedMode resets from 'input' back to 'display' for the new checkpoint.
     router.replace(pathname || '/', { scroll: false });
 
-    // Use a mutable local variable inside the interval — this completely
-    // avoids the stale-React-state bug where countdown was still 0 from
-    // the previous checkpoint when showingPreQr fired again.
-    let remaining = 10;
-    setCountdown(remaining);
+    // Use a mutable local variable inside the interval
+    let remaining = countdown;
 
     intervalRef.current = setInterval(() => {
       remaining -= 1;
