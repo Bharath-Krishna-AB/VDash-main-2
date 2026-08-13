@@ -171,3 +171,20 @@ export async function bulkCreateAccountsAction(rows: { username: string; passwor
 
   return { results };
 }
+export async function bulkDeleteAccountsAction(ids: string[]) {
+  try {
+    await requireAdmin();
+  } catch (err: any) {
+    return { error: err.message };
+  }
+
+  // Delete associated route assignments first to satisfy foreign key constraint
+  const { error: assignError } = await supabaseAdmin.from('assignroute').delete().in('teamid', ids);
+  if (assignError) return { error: assignError.message };
+
+  const { error } = await supabaseAdmin.from('profiles').delete().in('id', ids);
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin/create-account');
+  return { success: true };
+}
