@@ -8,15 +8,19 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 
 export async function login(username: string, password: string) {
-  // Resolve username to profile using admin client
-  const { data: profile } = await supabaseAdmin
+  const cleanInput = username.replace(/\s+/g, '').toLowerCase();
+
+  // Fetch profiles matching the password to find the correct username case/spacing
+  const { data: profiles } = await supabaseAdmin
     .from('profiles')
-    .select('id, role, password')
-    .eq('username', username)
-    .eq('password', password)
-    .single();
+    .select('id, username, role, password')
+    .eq('password', password);
+
+  const profile = profiles?.find(p => p.username.replace(/\s+/g, '').toLowerCase() === cleanInput);
 
   if (!profile) redirect('/login?error=invalid');
+
+  const actualUsername = profile.username;
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -29,10 +33,10 @@ export async function login(username: string, password: string) {
 
   if (error) redirect('/login?error=invalid');
 
-  // Save the actual profile role, id, and username to cookies for the proxy
+  // Save the actual profile role, id, and actual username to cookies for the proxy
   cookieStore.set('user_role', profile.role, { path: '/' });
   cookieStore.set('user_id', profile.id, { path: '/' });
-  cookieStore.set('user_name', username, { path: '/' });
+  cookieStore.set('user_name', actualUsername, { path: '/' });
 
   if (profile.role === 'admin') redirect('/admin');
 
@@ -44,16 +48,16 @@ export async function login(username: string, password: string) {
     .single();
 
   const hasStarted = assignment?.start === true;
-  const tutorialCookie = cookieStore.get(`tutorial_seen_${username}`);
+  const tutorialCookie = cookieStore.get(`tutorial_seen_${actualUsername}`);
   
   // Only show tutorial if it's their first time AND the timer hasn't started yet
   if (!tutorialCookie && !hasStarted) {
     // Set cookie so it never shows again for this user on this browser
-    cookieStore.set(`tutorial_seen_${username}`, 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 * 10 }); // 10 years
-    redirect(`/teams/${username}?tutorial=true`);
+    cookieStore.set(`tutorial_seen_${actualUsername}`, 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 * 10 }); // 10 years
+    redirect(`/teams/${actualUsername}?tutorial=true`);
   }
 
-  redirect(`/teams/${username}`);
+  redirect(`/teams/${actualUsername}`);
 }
 
 export async function logout() {
