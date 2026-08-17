@@ -45,7 +45,7 @@ export default function TimerCard({ teamName }: TimerCardProps) {
 
       // Warning sound at 20% or less of the total available time (including bonus)
       if (remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2) {
-        setIsWarning(true);
+          setIsWarning(true);
         if (audioRef.current && audioRef.current.paused) {
           audioRef.current.currentTime = 0;
           audioRef.current.play().catch(e => console.log('Autoplay blocked:', e));

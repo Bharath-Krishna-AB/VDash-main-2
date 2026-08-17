@@ -17,7 +17,7 @@ export default function HintModal({ active, onClose }: { active: boolean, onClos
   const [frozenHint, setFrozenHint] = useState<FrozenHint | null>(null);
 
   // Mirror the exact same threshold as TimerCard / FooterActions:
-  // ≤10% of total available time (base + bonus) — when audio starts & timer turns red.
+  // ≤20% of total available time (base + bonus) — when audio starts & timer turns red.
   useEffect(() => {
     if (!gameState.timeStarted || gameState.isCompleted || !currentCheckpoint) return;
 
@@ -27,7 +27,7 @@ export default function HintModal({ active, onClose }: { active: boolean, onClos
     const check = () => {
       const elapsed = Date.now() - gameState.timeStarted!;
       const remainingMs = Math.max(0, TOTAL_MS - elapsed);
-      const inWarning = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.1;
+      const inWarning = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2;
 
       if (inWarning) {
         // Only freeze/update when warning fires for a checkpoint we haven't frozen yet

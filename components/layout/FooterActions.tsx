@@ -29,7 +29,7 @@ export default function FooterActions() {
   const lastRedDotCheckpointRef = useRef<number>(-1);
 
   // ── Warning / unlock logic ───────────────────────────────────────────────
-  // Mirrors TimerCard.tsx exactly: warning fires at ≤10% of total available
+  // Mirrors TimerCard.tsx exactly: warning fires at ≤20% of total available
   // time (base duration + any early-finish bonus), which is when the audio
   // starts playing and the timer UI turns red.
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function FooterActions() {
     const check = () => {
       const elapsed = Date.now() - gameState.timeStarted!;
       const remainingMs = Math.max(0, TOTAL_MS - elapsed);
-      const isWarn = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.1;
+      const isWarn = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2;
       
       setIsWarning(isWarn);
       
