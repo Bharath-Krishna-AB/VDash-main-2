@@ -36,6 +36,8 @@ interface GameContextType {
   isLoading: boolean;
 }
 
+import { createClient } from '@/utils/supabase/client';
+
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export function GameProvider({ teamName, children }: { teamName: string; children: ReactNode }) {
@@ -51,6 +53,22 @@ export function GameProvider({ teamName, children }: { teamName: string; childre
   });
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase.channel('admin-route-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'routes' }, () => {
+        window.location.reload();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'checkpoints' }, () => {
+        window.location.reload();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     async function loadState() {
