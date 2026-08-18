@@ -1,7 +1,7 @@
 'use server';
 
 import { supabaseAdmin } from '@/utils/supabase/admin';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { CheckpointData } from '@/components/admin/CheckpointItem';
 
 export async function addCheckpoint(data: Omit<CheckpointData, 'id' | 'created_at' | 'index'>) {
@@ -16,7 +16,8 @@ export async function addCheckpoint(data: Omit<CheckpointData, 'id' | 'created_a
     throw new Error('Failed to add checkpoint.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('checkpoints', 'default');
+  revalidatePath('/admin/routes', 'page');
   return insertedData;
 }
 
@@ -31,7 +32,8 @@ export async function updateCheckpoint(id: string, data: Partial<CheckpointData>
     throw new Error('Failed to update checkpoint.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('checkpoints', 'default');
+  revalidatePath('/admin/routes', 'page');
   return { success: true };
 }
 
@@ -46,7 +48,8 @@ export async function deleteCheckpoint(id: string) {
     throw new Error('Failed to delete checkpoint.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('checkpoints', 'default');
+  revalidatePath('/admin/routes', 'page');
   return { success: true };
 }
 
@@ -79,7 +82,8 @@ export async function addRoute(data: DBRouteData) {
     throw new Error('Failed to add route.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('routes', 'default');
+  revalidatePath('/admin/routes', 'page');
   return insertedData;
 }
 
@@ -94,7 +98,8 @@ export async function updateRoute(id: string, data: Partial<DBRouteData>) {
     throw new Error('Failed to update route.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('routes', 'default');
+  revalidatePath('/admin/routes', 'page');
   return { success: true };
 }
 
@@ -109,6 +114,7 @@ export async function deleteRoute(id: string) {
     throw new Error('Failed to delete route.');
   }
 
-  revalidatePath('/admin/routes');
+  revalidateTag('routes', 'default');
+  revalidatePath('/admin/routes', 'page');
   return { success: true };
 }

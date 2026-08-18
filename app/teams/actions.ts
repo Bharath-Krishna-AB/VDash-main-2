@@ -2,49 +2,61 @@
 
 import { supabaseAdmin } from '@/utils/supabase/admin';
 
+import { unstable_cache } from 'next/cache';
+
+const getCachedRoutes = unstable_cache(
+  async () => {
+    const { data: routes } = await supabaseAdmin.from('routes').select('*');
+    return routes || [];
+  },
+  ['all-routes'],
+  { tags: ['routes'] }
+);
+
+const getCachedCheckpoints = unstable_cache(
+  async () => {
+    const { data: checkpoints } = await supabaseAdmin.from('checkpoints').select('*');
+    return checkpoints || [];
+  },
+  ['all-checkpoints'],
+  { tags: ['checkpoints'] }
+);
+
 export async function fetchTeamGameState(teamName: string) {
-  // 1. Get the team profile
-  const { data: profile } = await supabaseAdmin
+  // 1 & 2. Get the team profile and their assigned route in one query
+  const { data: profileData } = await supabaseAdmin
     .from('profiles')
-    .select('id, username')
+    .select(`
+      id,
+      username,
+      assignroute (*)
+    `)
     .eq('username', teamName)
     .single();
 
-  if (!profile) return null;
+  if (!profileData) return null;
 
-  // 2. Get the assigned route
-  const { data: assignment } = await supabaseAdmin
-    .from('assignroute')
-    .select('*')
-    .eq('teamid', profile.id)
-    .single();
+  const profile = { id: profileData.id, username: profileData.username };
+  const assignment = Array.isArray(profileData.assignroute) 
+    ? profileData.assignroute[0] 
+    : profileData.assignroute;
 
   if (!assignment) return null;
 
-  // 3. Get the route details
-  const { data: route } = await supabaseAdmin
-    .from('routes')
-    .select('*')
-    .eq('id', assignment.routeid)
-    .single();
+  // 3. Get the route details from cache
+  const allRoutes = await getCachedRoutes();
+  const route = allRoutes.find(r => r.id === assignment.routeid);
 
   if (!route) return null;
 
-  // 4. Get all checkpoints for this route
-  const checkpointIds = [route.ch1, route.ch2, route.ch3, route.ch4, route.ch5].filter(Boolean);
-  
-  const { data: checkpoints } = await supabaseAdmin
-    .from('checkpoints')
-    .select('*')
-    .in('id', checkpointIds);
-
-  if (!checkpoints) return null;
+  // 4. Get checkpoints from cache
+  const allCheckpoints = await getCachedCheckpoints();
 
   // Ensure checkpoints are ordered correctly as defined in the route
   const orderedCheckpoints = [
     route.ch1, route.ch2, route.ch3, route.ch4, route.ch5
   ].map((id, idx) => {
-    const cp = checkpoints.find(c => c.id === id);
+    const cp = allCheckpoints.find(c => c.id === id);
     if (!cp) return null;
     return {
       id: cp.id,
