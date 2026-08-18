@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import AnnouncementPopup from './AnnouncementPopup';
+import { useGame } from './GameContext';
 
 export default function AnnouncementListener() {
   const [active, setActive] = useState(false);
   const [message, setMessage] = useState('');
+  const { gameState } = useGame();
 
   useEffect(() => {
     const supabase = createClient();
@@ -26,6 +28,7 @@ export default function AnnouncementListener() {
       const { data, error } = await supabase
         .from('announcements')
         .select('id, message')
+        .or(`route_id.is.null,route_id.eq.${gameState.routeId}`)
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
@@ -44,9 +47,11 @@ export default function AnnouncementListener() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'announcements' },
         (payload) => {
-          const newRecord = payload.new as { id: string; message: string };
+          const newRecord = payload.new as { id: string; message: string; route_id: string | null };
           if (newRecord && newRecord.id) {
-            processAnnouncement(newRecord.id, newRecord.message);
+            if (newRecord.route_id === null || newRecord.route_id === gameState.routeId) {
+              processAnnouncement(newRecord.id, newRecord.message);
+            }
           }
         }
       )
@@ -56,7 +61,7 @@ export default function AnnouncementListener() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [gameState.routeId]);
 
   return (
     <AnnouncementPopup 

@@ -21,6 +21,7 @@ interface GameState {
   showingPreQr: boolean; // true during the 5-second QR countdown before timer starts
   pendingBonusMs: number; // bonus time carried over from finishing previous checkpoint early
   activeBonusMs: number; // the bonus time currently applied to the active timer
+  routeId: string | null;
 }
 
 interface GameContextType {
@@ -50,6 +51,7 @@ export function GameProvider({ teamName, children }: { teamName: string; childre
     showingPreQr: false,
     pendingBonusMs: 0,
     activeBonusMs: 0,
+    routeId: null,
   });
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -113,6 +115,7 @@ export function GameProvider({ teamName, children }: { teamName: string; childre
             showingPreQr: false, // never re-show QR on page reload/re-login
             pendingBonusMs: 0,
             activeBonusMs: loadedBonus,
+            routeId: data.route.id,
           });
         }
       } catch (e) {
