@@ -30,9 +30,25 @@ export default function TimerCard({ teamName }: TimerCardProps) {
   useEffect(() => {
     if (!gameState.timeStarted || gameState.isCompleted || !currentCheckpoint) return;
 
-    // Use specific checkpoint duration (in seconds)
     const TOTAL_MS = currentCheckpoint.durationSeconds * 1000;
     const TOTAL_AVAILABLE_MS = TOTAL_MS + gameState.activeBonusMs;
+    const warningTimestamp = gameState.timeStarted! + TOTAL_MS - (TOTAL_AVAILABLE_MS * 0.2);
+
+    const checkWarning = () => {
+      const now = Date.now();
+      const isWarn = now >= warningTimestamp && now < gameState.timeStarted! + TOTAL_MS;
+      setIsWarning(isWarn);
+      if (isWarn) {
+        if (audioRef.current && audioRef.current.paused) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play().catch(e => console.log('Autoplay blocked:', e));
+        }
+      } else {
+        if (audioRef.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+        }
+      }
+    };
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - gameState.timeStarted!;
@@ -43,19 +59,7 @@ export default function TimerCard({ teamName }: TimerCardProps) {
 
       setTimeRemaining(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
 
-      // Warning sound at 20% or less of the total available time (including bonus)
-      if (remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2) {
-          setIsWarning(true);
-        if (audioRef.current && audioRef.current.paused) {
-          audioRef.current.currentTime = 0;
-          audioRef.current.play().catch(e => console.log('Autoplay blocked:', e));
-        }
-      } else {
-        setIsWarning(false);
-        if (audioRef.current && !audioRef.current.paused) {
-          audioRef.current.pause();
-        }
-      }
+      checkWarning();
 
       if (remainingMs === 0) {
         clearInterval(interval);
@@ -73,11 +77,19 @@ export default function TimerCard({ teamName }: TimerCardProps) {
     const s = Math.floor((initialRemainingMs % 60000) / 1000);
     const initTimer = setTimeout(() => {
       setTimeRemaining(`${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+      checkWarning();
     }, 0);
+
+    let warningTimeout: ReturnType<typeof setTimeout> | null = null;
+    const now = Date.now();
+    if (now < warningTimestamp) {
+      warningTimeout = setTimeout(checkWarning, warningTimestamp - now);
+    }
 
     return () => {
       clearInterval(interval);
       clearTimeout(initTimer);
+      if (warningTimeout) clearTimeout(warningTimeout);
       if (audioRef.current) audioRef.current.pause();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -183,7 +183,7 @@ export default function ActiveAccountsList({ initialProfiles }: { initialProfile
   const filteredProfiles = profiles.filter(p => 
     p.role === activeTab && 
     (p.username.toLowerCase().includes(searchQuery.toLowerCase()) || 
-     (p.phonenumber && p.phonenumber.includes(searchQuery)))
+     (p.phonenumber && p.phonenumber.toString().includes(searchQuery)))
   );
 
   const adminCount = profiles.filter(p => p.role === 'admin').length;

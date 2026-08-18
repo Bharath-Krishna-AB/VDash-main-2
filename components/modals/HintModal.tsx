@@ -23,11 +23,11 @@ export default function HintModal({ active, onClose }: { active: boolean, onClos
 
     const TOTAL_MS = currentCheckpoint.durationSeconds * 1000;
     const TOTAL_AVAILABLE_MS = TOTAL_MS + gameState.activeBonusMs;
+    const warningTimestamp = gameState.timeStarted! + TOTAL_MS - (TOTAL_AVAILABLE_MS * 0.2);
 
     const check = () => {
-      const elapsed = Date.now() - gameState.timeStarted!;
-      const remainingMs = Math.max(0, TOTAL_MS - elapsed);
-      const inWarning = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2;
+      const now = Date.now();
+      const inWarning = now >= warningTimestamp && now < gameState.timeStarted! + TOTAL_MS;
 
       if (inWarning) {
         // Only freeze/update when warning fires for a checkpoint we haven't frozen yet
@@ -44,7 +44,17 @@ export default function HintModal({ active, onClose }: { active: boolean, onClos
 
     check();
     const interval = setInterval(check, 1000);
-    return () => clearInterval(interval);
+
+    let warningTimeout: ReturnType<typeof setTimeout> | null = null;
+    const now = Date.now();
+    if (now < warningTimestamp) {
+      warningTimeout = setTimeout(check, warningTimestamp - now);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (warningTimeout) clearTimeout(warningTimeout);
+    };
   }, [gameState.timeStarted, gameState.isCompleted, currentCheckpoint, gameState.activeBonusMs, gameState.currentCheckpointIndex]);
 
   // What to show: frozen snapshot if available, otherwise fall back to live data

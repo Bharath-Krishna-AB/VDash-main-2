@@ -40,14 +40,14 @@ export default function FooterActions() {
 
     const TOTAL_MS = currentCheckpoint.durationSeconds * 1000;
     const TOTAL_AVAILABLE_MS = TOTAL_MS + gameState.activeBonusMs;
+    const warningTimestamp = gameState.timeStarted! + TOTAL_MS - (TOTAL_AVAILABLE_MS * 0.2);
 
     const check = () => {
-      const elapsed = Date.now() - gameState.timeStarted!;
-      const remainingMs = Math.max(0, TOTAL_MS - elapsed);
-      const isWarn = remainingMs > 0 && remainingMs <= TOTAL_AVAILABLE_MS * 0.2;
-      
+      const now = Date.now();
+      const isWarn = now >= warningTimestamp && now < gameState.timeStarted! + TOTAL_MS;
+
       setIsWarning(isWarn);
-      
+
       if (isWarn) {
         setHintUnlocked(true);
         const cpIndex = gameState.currentCheckpointIndex;
@@ -57,7 +57,7 @@ export default function FooterActions() {
           setIsAttention(true);
           if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
           attentionTimerRef.current = setTimeout(() => setIsAttention(false), 700);
-          
+
           const url = new URL(window.location.href);
           url.searchParams.set('modal', 'hint');
           window.history.pushState(null, '', url.toString());
@@ -67,7 +67,17 @@ export default function FooterActions() {
 
     check(); // immediate
     const interval = setInterval(check, 1000);
-    return () => clearInterval(interval);
+
+    let warningTimeout: ReturnType<typeof setTimeout> | null = null;
+    const now = Date.now();
+    if (now < warningTimestamp) {
+      warningTimeout = setTimeout(check, warningTimestamp - now);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (warningTimeout) clearTimeout(warningTimeout);
+    };
   }, [gameState.timeStarted, gameState.isCompleted, currentCheckpoint, gameState.activeBonusMs, gameState.currentCheckpointIndex]);
 
   // ── Dismiss red dot when hint modal opens ────────────────────────────────
