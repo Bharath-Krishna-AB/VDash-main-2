@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 
-export async function broadcastAnnouncement(message: string) {
+export async function broadcastAnnouncement(message: string, routeId: string | null = null) {
   const cookieStore = await cookies();
   const role = cookieStore.get('user_role')?.value;
 
@@ -22,7 +22,7 @@ export async function broadcastAnnouncement(message: string) {
 
   const { error } = await supabaseAdmin
     .from('announcements')
-    .insert([{ message: trimmedMessage }]);
+    .insert([{ message: trimmedMessage, route_id: routeId }]);
 
   if (error) {
     console.error('Error inserting announcement:', error);
@@ -30,4 +30,24 @@ export async function broadcastAnnouncement(message: string) {
   }
   
   return { success: true };
+}
+
+export async function getAvailableRoutes() {
+  const cookieStore = await cookies();
+  const role = cookieStore.get('user_role')?.value;
+
+  if (role !== 'admin') {
+    throw new Error('Unauthorized');
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('routes')
+    .select('id, title')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching routes:', error);
+    return [];
+  }
+  return data;
 }

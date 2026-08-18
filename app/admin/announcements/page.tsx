@@ -1,11 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { broadcastAnnouncement } from './actions';
+import React, { useState, useEffect } from 'react';
+import { broadcastAnnouncement, getAvailableRoutes } from './actions';
 
 export default function AdminAnnouncementsPage() {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [routeId, setRouteId] = useState<string>('');
+  const [routes, setRoutes] = useState<{id: string, title: string}[]>([]);
+
+  useEffect(() => {
+    async function loadRoutes() {
+      const data = await getAvailableRoutes();
+      setRoutes(data);
+    }
+    loadRoutes();
+  }, []);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,7 +23,7 @@ export default function AdminAnnouncementsPage() {
 
     setStatus('loading');
     try {
-      await broadcastAnnouncement(message.trim());
+      await broadcastAnnouncement(message.trim(), routeId === '' ? null : routeId);
       setStatus('success');
       setMessage('');
       setTimeout(() => setStatus('idle'), 3000);
@@ -33,6 +43,18 @@ export default function AdminAnnouncementsPage() {
       </div>
 
       <form onSubmit={handleSend} className="flex flex-col flex-1 min-h-0 gap-5">
+        <select
+          value={routeId}
+          onChange={(e) => setRouteId(e.target.value)}
+          className="w-full rounded-[1.5rem] bg-zinc-900 border-[3px] border-zinc-800 text-white p-4 focus:outline-none focus:border-zinc-700 transition-colors font-medium appearance-none"
+          disabled={status === 'loading'}
+        >
+          <option value="">All Teams (Default)</option>
+          {routes.map(r => (
+            <option key={r.id} value={r.id}>{r.title}</option>
+          ))}
+        </select>
+
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
